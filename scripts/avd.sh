@@ -4,10 +4,9 @@ set -e
 shopt -s extglob
 . scripts/test_common.sh
 
-emu_args_base="-no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -read-only -no-snapshot -cores $core_count"
+emu_args_base="-no-window -no-audio -no-boot-anim -gpu software -read-only -no-snapshot -cores $core_count"
 log_args="-show-kernel -logcat '' -logcat-output logcat.log"
 emu_args=
-emu_pid=
 
 atd_min_api=30
 atd_max_api=36
@@ -33,7 +32,7 @@ esac
 
 cleanup() {
   rm -f magisk_*.img
-  "$avd" delete avd -n test
+  "$avd" delete avd -n test > /dev/null 2>&1
 }
 
 test_error() {
@@ -57,17 +56,6 @@ wait_for_boot() {
     fi
     sleep 2
   done
-}
-
-wait_emu() {
-  local which_pid
-
-  timeout $boot_timeout bash -c wait_for_boot &
-  local wait_pid=$!
-
-  # Handle the case when emulator dies earlier than timeout
-  wait -p which_pid -n $emu_pid $wait_pid
-  [ $which_pid -eq $wait_pid ]
 }
 
 dump_vars() {
@@ -135,7 +123,12 @@ resolve_vars() {
 dl_emu() {
   local avd_pkg=$1
   yes | "$sdk" --licenses > /dev/null 2>&1
-  "$sdk" --channel=3 platform-tools emulator $avd_pkg
+  "$sdk" --channel=3 'cmdline-tools;latest' platform-tools emulator "$avd_pkg"
+  # It's possible cmdline-tools updated
+  if [ -e "${cli_tools}-2" ]; then
+    rm -rf "$cli_tools"
+    mv "${cli_tools}-2" "$cli_tools"
+  fi
 }
 
 setup_emu() {
@@ -143,11 +136,6 @@ setup_emu() {
   local ver=$2
   dl_emu $avd_pkg
   echo no | "$avd" create avd -f -n test -k $avd_pkg
-
-  # avdmanager is outdated, it might not set the proper target
-  local ini=$ANDROID_AVD_HOME/test.ini
-  sed "s:^target\s*=.*:target=android-$ver:g" $ini > $ini.new
-  mv $ini.new $ini
 }
 
 test_emu() {
@@ -162,18 +150,17 @@ test_emu() {
     "$emu" @test $emu_args $magisk_args > /dev/null 2>&1 &
   fi
 
-  emu_pid=$!
-  wait_emu
+  timeout $boot_timeout bash -c wait_for_boot
 
   run_setup $variant
 
   adb reboot
-  wait_emu
+  timeout $boot_timeout bash -c wait_for_boot
 
   run_tests
 
-  kill -INT $emu_pid
-  wait $emu_pid
+  adb emu kill
+  wait
 }
 
 test_main() {
@@ -193,9 +180,8 @@ test_main() {
 
   # Launch stock emulator
   print_title "* Launching $avd_pkg"
-  "$emu" @test $emu_args >/dev/null 2>&1 &
-  emu_pid=$!
-  wait_emu
+  "$emu" @test $emu_args > /dev/null 2>&1 &
+  timeout $boot_timeout bash -c wait_for_boot
 
   # Patch images
   if [ -z "$AVD_TEST_SKIP_DEBUG" ]; then
@@ -205,8 +191,8 @@ test_main() {
     ./build.py -vr avd_patch "$ramdisk" magisk_release.img
   fi
 
-  kill -INT $emu_pid
-  wait $emu_pid
+  adb emu kill
+  wait
 
   if [ -z "$AVD_TEST_SKIP_DEBUG" ]; then
     print_title "* Testing $avd_pkg (debug)"
@@ -226,7 +212,8 @@ run_main() {
   eval $(resolve_vars "ver avd_pkg" $1 $2)
   setup_emu "$avd_pkg" $ver
   print_title "* Launching $avd_pkg"
-  "$emu" @test $emu_args 2>/dev/null
+  "$emu" @test $emu_args > /dev/null 2>&1 &
+  wait_for_boot
   cleanup
 }
 
