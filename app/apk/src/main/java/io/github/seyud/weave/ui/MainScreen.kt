@@ -679,7 +679,8 @@ private fun MainTabScreen(
                     )
                     1 -> if (isCurrentPage || contentReady) SuperuserScreen(
                         viewModel = superuserViewModel,
-                        contentBottomPadding = contentBottomPadding
+                        contentBottomPadding = contentBottomPadding,
+                        isActive = isCurrentPage,
                     )
                     2 -> if (isCurrentPage || contentReady) ModuleScreen(
                         viewModel = moduleViewModel,
