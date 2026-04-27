@@ -39,6 +39,13 @@ object Config : PreferenceConfig, DBConfig {
         const val SU_TAPJACK = "su_tapjack"
         const val SU_LIST_MODE = "su_list_mode"
         const val SU_RESTRICT = "su_restrict"
+        const val SU_LIST_MODE_DENYLIST_SNAPSHOT = "su_list_mode_denylist_snapshot"
+        const val SU_LIST_MODE_DENYLIST_SNAPSHOT_ENABLED = "su_list_mode_denylist_snapshot_enabled"
+        const val SU_LIST_MODE_DENYLIST_SNAPSHOT_VALID = "su_list_mode_denylist_snapshot_valid"
+        const val SU_LIST_MODE_DENYLIST_PENDING_TARGET_MODE = "su_list_mode_denylist_pending_target_mode"
+        const val SU_LIST_MODE_DENYLIST_PENDING_FALLBACK_MODE = "su_list_mode_denylist_pending_fallback_mode"
+        const val SU_LIST_MODE_DENYLIST_PENDING_SERIAL = "su_list_mode_denylist_pending_serial"
+        const val SU_LIST_MODE_DENYLIST_PENDING_VALID = "su_list_mode_denylist_pending_valid"
         const val CHECK_UPDATES = "check_update"
         const val RELEASE_CHANNEL = "release_channel"
         const val CUSTOM_CHANNEL = "custom_channel"
@@ -62,8 +69,20 @@ object Config : PreferenceConfig, DBConfig {
         const val HOME_LAYOUT_MODE = "home_layout_mode"
         const val APP_ICON_VARIANT = "app_icon_variant"
 
-        val NO_MIGRATION = setOf(ASKED_HOME, SU_REQUEST_TIMEOUT,
-            SU_AUTO_RESPONSE, SU_REAUTH, SU_TAPJACK)
+        val NO_MIGRATION = setOf(
+            ASKED_HOME,
+            SU_REQUEST_TIMEOUT,
+            SU_AUTO_RESPONSE,
+            SU_REAUTH,
+            SU_TAPJACK,
+            SU_LIST_MODE_DENYLIST_SNAPSHOT,
+            SU_LIST_MODE_DENYLIST_SNAPSHOT_ENABLED,
+            SU_LIST_MODE_DENYLIST_SNAPSHOT_VALID,
+            SU_LIST_MODE_DENYLIST_PENDING_TARGET_MODE,
+            SU_LIST_MODE_DENYLIST_PENDING_FALLBACK_MODE,
+            SU_LIST_MODE_DENYLIST_PENDING_SERIAL,
+            SU_LIST_MODE_DENYLIST_PENDING_VALID,
+        )
     }
 
     object OldValue {
@@ -209,6 +228,13 @@ object Config : PreferenceConfig, DBConfig {
     var suTapjack by preference(Key.SU_TAPJACK, true)
     var suListMode by preference(Key.SU_LIST_MODE, Value.SU_MODE_WHITELIST)
     var suRestrict by preference(Key.SU_RESTRICT, false)
+    var suListModeDenyListSnapshot by preference(Key.SU_LIST_MODE_DENYLIST_SNAPSHOT, "")
+    var suListModeDenyListSnapshotEnabled by preference(Key.SU_LIST_MODE_DENYLIST_SNAPSHOT_ENABLED, false)
+    var suListModeDenyListSnapshotValid by preference(Key.SU_LIST_MODE_DENYLIST_SNAPSHOT_VALID, false)
+    var suListModeDenyListPendingTargetMode by preference(Key.SU_LIST_MODE_DENYLIST_PENDING_TARGET_MODE, Value.SU_MODE_WHITELIST)
+    var suListModeDenyListPendingFallbackMode by preference(Key.SU_LIST_MODE_DENYLIST_PENDING_FALLBACK_MODE, Value.SU_MODE_BLACKLIST)
+    var suListModeDenyListPendingSerial by preference(Key.SU_LIST_MODE_DENYLIST_PENDING_SERIAL, 0)
+    var suListModeDenyListPendingValid by preference(Key.SU_LIST_MODE_DENYLIST_PENDING_VALID, false)
 
     private const val SU_FINGERPRINT = "su_fingerprint"
     private const val UPDATE_CHANNEL = "update_channel"

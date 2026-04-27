@@ -7,7 +7,7 @@ import io.github.seyud.weave.core.integration.ZygiskNextDenylistPolicy
 internal data class SuperuserModeApplyResult(
     val appliedMode: Int,
     val success: Boolean,
-    val zygiskNextAvailable: Boolean,
+    val zygiskNextActive: Boolean,
 )
 
 internal fun superuserModeUsesWhitelist(mode: Int): Boolean = isWhitelistMode(mode)
@@ -19,7 +19,12 @@ internal class SuperuserModeSyncCoordinator(
     private val zygiskNextPolicy: ZygiskNextDenylistPolicy = ShellZygiskNextDenylistPolicy,
 ) {
 
+    suspend fun isZygiskNextActive(): Boolean = zygiskNextPolicy.isActive()
+
     suspend fun resolveMode(currentMode: Int): Int {
+        if (!zygiskNextPolicy.isActive()) {
+            return normalizeSuperuserListMode(currentMode)
+        }
         val whitelistEnabled = zygiskNextPolicy.getWhitelistMode() ?: return normalizeSuperuserListMode(currentMode)
         return whitelistEnabledToSuperuserMode(whitelistEnabled)
     }
@@ -27,18 +32,21 @@ internal class SuperuserModeSyncCoordinator(
     suspend fun applyMode(requestedMode: Int): SuperuserModeApplyResult {
         val normalizedMode = normalizeSuperuserListMode(requestedMode)
         val whitelistEnabled = superuserModeUsesWhitelist(normalizedMode)
-        val currentWhitelistMode = zygiskNextPolicy.getWhitelistMode()
-            ?: return SuperuserModeApplyResult(
-                appliedMode = normalizedMode,
-                success = true,
-                zygiskNextAvailable = false,
-            )
-
-        if (currentWhitelistMode == whitelistEnabled) {
+        if (!zygiskNextPolicy.isActive()) {
             return SuperuserModeApplyResult(
                 appliedMode = normalizedMode,
                 success = true,
-                zygiskNextAvailable = true,
+                zygiskNextActive = false,
+            )
+        }
+
+        val currentWhitelistMode = zygiskNextPolicy.getWhitelistMode()
+
+        if (currentWhitelistMode != null && currentWhitelistMode == whitelistEnabled) {
+            return SuperuserModeApplyResult(
+                appliedMode = normalizedMode,
+                success = true,
+                zygiskNextActive = true,
             )
         }
 
@@ -46,7 +54,7 @@ internal class SuperuserModeSyncCoordinator(
         return SuperuserModeApplyResult(
             appliedMode = normalizedMode,
             success = success,
-            zygiskNextAvailable = true,
+            zygiskNextActive = true,
         )
     }
 }

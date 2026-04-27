@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.seyud.weave.ui.theme.LocalEnableBlur
 import io.github.seyud.weave.ui.util.attachBarBlurBackdrop
 import io.github.seyud.weave.ui.util.barBlurContainerColor
@@ -42,7 +44,8 @@ fun SettingsScreen(
     val surfaceColor = colorScheme.surface
     val blurBackdrop = rememberBarBlurBackdrop(enableBlur, surfaceColor)
     val localState = rememberSettingsScreenLocalState()
-    val visibility = rememberSettingsVisibility(context)
+    val currentSuperuserListMode by viewModel.superuserListMode.collectAsStateWithLifecycle()
+    val visibility = rememberSettingsVisibility(context, currentSuperuserListMode)
 
     DisposableEffect(viewModel, onNavigateToLog, onNavigateToDenyListConfig, onSuperuserModeChanged) {
         viewModel.onNavigateToLog = onNavigateToLog
@@ -80,6 +83,7 @@ fun SettingsScreen(
                 viewModel = viewModel,
                 localState = localState,
                 visibility = visibility,
+                currentSuperuserListMode = currentSuperuserListMode,
                 isActive = isActive,
                 contentBottomPadding = contentBottomPadding,
                 nestedScrollConnection = scrollBehavior.nestedScrollConnection,

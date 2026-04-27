@@ -82,28 +82,32 @@ internal fun AccessModeSelectorItem(res: Resources) {
 internal fun SuperuserModeSelectorItem(
     res: Resources,
     viewModel: SettingsViewModel,
+    currentMode: Int,
     isActive: Boolean,
 ) {
     val entries = remember(res) { res.getStringArray(CoreR.array.su_list_mode) }
-    var selected by rememberSaveable {
-        mutableIntStateOf(
-            normalizeSuperuserListMode(Config.suListMode).coerceIn(0, entries.size - 1),
-        )
+    var displayedSelection by rememberSaveable {
+        mutableIntStateOf(currentMode.coerceIn(0, entries.size - 1))
     }
     var isUpdating by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(currentMode, entries.size, isUpdating) {
+        if (!isUpdating) {
+            displayedSelection = currentMode.coerceIn(0, entries.size - 1)
+        }
+    }
 
     LaunchedEffect(viewModel, isActive) {
         if (!isActive) {
             return@LaunchedEffect
         }
-        isUpdating = true
         viewModel.refreshSuperuserListMode { resolvedMode ->
-            selected = resolvedMode.coerceIn(0, entries.size - 1)
-            isUpdating = false
+            displayedSelection = resolvedMode.coerceIn(0, entries.size - 1)
         }
     }
 
-    val summary = when (selected) {
+    val selectedIndex = displayedSelection.coerceIn(0, entries.size - 1)
+    val summary = when (selectedIndex) {
         Config.Value.SU_MODE_BLACKLIST -> stringResource(CoreR.string.settings_su_mode_summary_blacklist)
         else -> stringResource(CoreR.string.settings_su_mode_summary_whitelist)
     }
@@ -112,15 +116,16 @@ internal fun SuperuserModeSelectorItem(
         title = stringResource(CoreR.string.settings_su_mode_title),
         summary = summary,
         items = entries.toList(),
-        selectedIndex = selected.coerceIn(0, entries.size - 1),
+        selectedIndex = selectedIndex,
         enabled = !isUpdating,
         onSelectedIndexChange = { index ->
             if (isUpdating) {
                 return@OverlayDropdownPreference
             }
+            displayedSelection = index.coerceIn(0, entries.size - 1)
             isUpdating = true
             viewModel.setSuperuserListMode(index) { appliedMode ->
-                selected = appliedMode.coerceIn(0, entries.size - 1)
+                displayedSelection = appliedMode.coerceIn(0, entries.size - 1)
                 isUpdating = false
             }
         },

@@ -1,5 +1,6 @@
 package io.github.seyud.weave.ui.settings
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -76,43 +77,49 @@ internal fun MagiskSettingsSection(
                 },
             )
 
-            var denyListEnabled by rememberSaveable { mutableStateOf(Config.denyList) }
-            SwitchPreference(
-                title = stringResource(CoreR.string.settings_denylist_title),
-                summary = stringResource(CoreR.string.settings_denylist_summary),
-                checked = denyListEnabled,
-                onCheckedChange = { checked ->
-                    val cmd = if (checked) "enable" else "disable"
-                    Shell.cmd("magisk --denylist $cmd").submit { result ->
-                        if (result.isSuccess) {
-                            Config.denyList = checked
-                            denyListEnabled = checked
+            AnimatedVisibility(visible = visibility.showDenyListControls) {
+                var denyListEnabled by rememberSaveable(visibility.isWhitelistMode) {
+                    mutableStateOf(Config.denyList)
+                }
+                SwitchPreference(
+                    title = stringResource(CoreR.string.settings_denylist_title),
+                    summary = stringResource(CoreR.string.settings_denylist_summary),
+                    checked = denyListEnabled,
+                    onCheckedChange = { checked ->
+                        val cmd = if (checked) "enable" else "disable"
+                        Shell.cmd("magisk --denylist $cmd").submit { result ->
+                            if (result.isSuccess) {
+                                Config.denyList = checked
+                                denyListEnabled = checked
+                            }
                         }
-                    }
-                },
-                startAction = {
-                    Icon(
-                        Icons.Rounded.Block,
-                        modifier = Modifier.padding(end = 6.dp),
-                        contentDescription = null,
-                        tint = colorScheme.onBackground,
-                    )
-                },
-            )
+                    },
+                    startAction = {
+                        Icon(
+                            Icons.Rounded.Block,
+                            modifier = Modifier.padding(end = 6.dp),
+                            contentDescription = null,
+                            tint = colorScheme.onBackground,
+                        )
+                    },
+                )
+            }
 
-            ArrowPreference(
-                title = stringResource(CoreR.string.settings_denylist_config_title),
-                summary = stringResource(CoreR.string.settings_denylist_config_summary),
-                startAction = {
-                    Icon(
-                        Icons.Rounded.Settings,
-                        modifier = Modifier.padding(end = 6.dp),
-                        contentDescription = null,
-                        tint = colorScheme.onBackground,
-                    )
-                },
-                onClick = { viewModel.navigateToDenyListConfig() },
-            )
+            AnimatedVisibility(visible = visibility.showDenyListControls) {
+                ArrowPreference(
+                    title = stringResource(CoreR.string.settings_denylist_config_title),
+                    summary = stringResource(CoreR.string.settings_denylist_config_summary),
+                    startAction = {
+                        Icon(
+                            Icons.Rounded.Settings,
+                            modifier = Modifier.padding(end = 6.dp),
+                            contentDescription = null,
+                            tint = colorScheme.onBackground,
+                        )
+                    },
+                    onClick = { viewModel.navigateToDenyListConfig() },
+                )
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ import io.github.seyud.weave.core.Const
 import io.github.seyud.weave.core.Info
 import io.github.seyud.weave.core.isRunningAsStub
 import io.github.seyud.weave.core.utils.LocaleSetting
+import io.github.seyud.weave.ui.superuser.isWhitelistMode
 import io.github.seyud.weave.core.R as CoreR
 
 internal data class SettingsVisibility(
@@ -29,6 +30,8 @@ internal data class SettingsVisibility(
     val showAddShortcut: Boolean,
     val showMagiskSection: Boolean,
     val showZygisk: Boolean,
+    val isWhitelistMode: Boolean,
+    val showDenyListControls: Boolean,
     val showSuperuserSection: Boolean,
     val showHideRestore: Boolean,
     val showTapjack: Boolean,
@@ -37,22 +40,29 @@ internal data class SettingsVisibility(
 )
 
 @Composable
-internal fun rememberSettingsVisibility(context: Context): SettingsVisibility {
+internal fun rememberSettingsVisibility(
+    context: Context,
+    currentSuperuserListMode: Int,
+): SettingsVisibility {
     return remember(
         context.packageName,
         Build.VERSION.SDK_INT,
         Info.env.isActive,
         Info.showSuperUser,
         Info.isZygiskEnabled,
+        currentSuperuserListMode,
         Const.USER_ID,
     ) {
         val showMagiskSection = Info.env.isActive
+        val whitelistMode = isWhitelistMode(currentSuperuserListMode)
         SettingsVisibility(
             hidden = context.packageName != BuildConfig.APP_PACKAGE_NAME,
             showAddShortcut = isRunningAsStub &&
                 ShortcutManagerCompat.isRequestPinShortcutSupported(context),
             showMagiskSection = showMagiskSection,
             showZygisk = showMagiskSection && Const.Version.atLeast_24_0(),
+            isWhitelistMode = whitelistMode,
+            showDenyListControls = showMagiskSection && !whitelistMode,
             showSuperuserSection = Info.showSuperUser,
             showHideRestore = Info.env.isActive && Const.USER_ID == 0,
             showTapjack = Build.VERSION.SDK_INT < Build.VERSION_CODES.S,

@@ -30,6 +30,7 @@ import io.github.seyud.weave.core.R as CoreR
 internal fun SuperuserSettingsSection(
     viewModel: SettingsViewModel,
     visibility: SettingsVisibility,
+    currentSuperuserListMode: Int,
     isActive: Boolean,
 ) {
     if (!visibility.showSuperuserSection) {
@@ -43,6 +44,7 @@ internal fun SuperuserSettingsSection(
         SuperuserModeSelectorItem(
             res = res,
             viewModel = viewModel,
+            currentMode = currentSuperuserListMode,
             isActive = isActive,
         )
 
