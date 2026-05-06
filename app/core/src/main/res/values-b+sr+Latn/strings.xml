@@ -24,7 +24,7 @@
     <string name="home_support_title">Podržite nas</string>
     <string name="home_follow_title">Zapratite nas</string>
     <string name="home_item_source">Izvor</string>
-    <string name="home_support_content">Magisk jeste i uvek će biti besplatan i open source. Međutim, možete pokazati da vam je stalo svojom donacijom.</string>
+    <string name="home_support_content">Magisk jeste i uvek će biti besplatan i open source. Međutim, možete pokazati da Vam je stalo svojom donacijom.</string>
     <string name="home_installed_version">Instalirano</string>
     <string name="home_latest_version">Najnovije</string>
     <string name="invalid_update_channel">Nevalidan kanal ažuriranja</string>
@@ -120,7 +120,7 @@
 
     <!--Settings-->
     <string name="settings_dark_mode_title">Tema</string>
-    <string name="settings_dark_mode_message">Izaberite temu koja vam najviše odgovara!</string>
+    <string name="settings_dark_mode_message">Izaberite temu koja Vam najviše odgovara!</string>
     <string name="settings_dark_mode_light">Uvek svetlo</string>
     <string name="settings_dark_mode_system">Prati sistem</string>
     <string name="settings_dark_mode_dark">Uvek tamno</string>
@@ -246,5 +246,4 @@
     <string name="app_not_found">Nije pronađena aplikacija za ovu akciju</string>
     <string name="reboot_apply_change">Ponovo pokreni da primeniš izmene</string>
     <string name="restore_app_confirmation">Ovo će vratiti skrivenu aplikaciju na originalnu. Da li stvarno to želite?</string>
-
 </resources>
