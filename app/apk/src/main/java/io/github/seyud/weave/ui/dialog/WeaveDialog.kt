@@ -18,7 +18,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -167,7 +171,10 @@ class WeaveDialog(
     }
 
     @Composable
-    internal fun Render() {
+    internal fun Render(
+        show: Boolean = true,
+        onDismissFinished: (() -> Unit)? = null,
+    ) {
         val dismissRequest = if (cancelable) {
             { dismiss() }
         } else {
@@ -182,10 +189,11 @@ class WeaveDialog(
         }
 
         WindowDialog(
-            show = true,
+            show = show,
             title = title.takeIf { it.isNotEmpty() }?.toString(),
             summary = message.takeIf { it.isNotEmpty() }?.toString(),
             onDismissRequest = dismissRequest,
+            onDismissFinished = onDismissFinished,
         ) {
             Column {
                 iconDrawable?.let { drawable ->
@@ -283,5 +291,24 @@ class WeaveDialog(
 fun WeaveDialogHostContent(
     dialog: WeaveDialog?,
 ) {
-    dialog?.Render()
+    var activeDialog by remember { mutableStateOf<WeaveDialog?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(dialog) {
+        if (dialog != null) {
+            activeDialog = dialog
+            showDialog = true
+        } else if (activeDialog != null) {
+            showDialog = false
+        }
+    }
+
+    activeDialog?.Render(
+        show = showDialog,
+        onDismissFinished = {
+            if (!showDialog) {
+                activeDialog = null
+            }
+        },
+    )
 }

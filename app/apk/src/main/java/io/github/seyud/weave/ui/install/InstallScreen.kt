@@ -21,21 +21,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.Observer
-import io.github.seyud.weave.R
 import io.github.seyud.weave.core.Config
 import io.github.seyud.weave.core.Info
 import io.github.seyud.weave.core.R as CoreR
 import io.github.seyud.weave.ui.component.MarkdownText
+import io.github.seyud.weave.ui.component.MiuixTextInputDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,7 +51,6 @@ import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextButton
-import top.yukonga.miuix.kmp.basic.TextField
 import top.yukonga.miuix.kmp.basic.TopAppBar
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.Back
@@ -84,8 +86,6 @@ fun InstallScreen(
     val scope = rememberCoroutineScope()
 
     val step = viewModel.step
-    val method = viewModel.method
-
     var keepVerity by remember { mutableStateOf(Config.keepVerity) }
     var keepEnc by remember { mutableStateOf(Config.keepEnc) }
     var recovery by remember { mutableStateOf(Config.recovery) }
@@ -107,6 +107,16 @@ fun InstallScreen(
                 else -> null
             }
         )
+    }
+
+    var showDownloadDialog by rememberSaveable { mutableStateOf(false) }
+    var downloadInput by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(viewModel.downloadUrl))
+    }
+
+    val openDownloadDialog = {
+        downloadInput = TextFieldValue(viewModel.downloadUrl)
+        showDownloadDialog = true
     }
 
     // 观察 viewModel.data (uri) 的变化
@@ -174,6 +184,30 @@ fun InstallScreen(
         }
     }
 
+    val trimmed = downloadInput.text.trim()
+    val isValid = isValidDownloadUrl(trimmed)
+    MiuixTextInputDialog(
+        show = showDownloadDialog,
+        title = stringResource(CoreR.string.download_dialog_title),
+        value = downloadInput,
+        onValueChange = { downloadInput = it },
+        label = stringResource(CoreR.string.download_dialog_msg),
+        helperText = if (downloadInput.text.isNotBlank() && !isValid) {
+            stringResource(CoreR.string.module_repo_source_invalid)
+        } else null,
+        confirmText = stringResource(android.R.string.ok),
+        dismissText = stringResource(android.R.string.cancel),
+        onDismissRequest = { showDownloadDialog = false },
+        onConfirm = {
+            if (isValid) {
+                viewModel.downloadUrl = trimmed
+                showDownloadDialog = false
+            }
+        },
+        confirmEnabled = isValid,
+        useOverlay = true,
+    )
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -236,7 +270,8 @@ fun InstallScreen(
                     noSecondSlot = noSecondSlot,
                     dataUri = dataUri,
                     downloadUrl = viewModel.downloadUrl,
-                    onDownloadUrlChange = { viewModel.downloadUrl = it },
+                    isDownloadUrlValid = isValidDownloadUrl(viewModel.downloadUrl),
+                    onRequestDownloadUrl = openDownloadDialog,
                     onMethodChange = { newMethod ->
                         selectedMethod = newMethod
                         viewModel.method = when (newMethod) {
@@ -249,6 +284,9 @@ fun InstallScreen(
                         // 如果选择了修补文件方法，立即触发文件选择器
                         if (newMethod == InstallMethod.PATCH) {
                             patchFilePicker.launch(arrayOf("*/*"))
+                        }
+                        if (newMethod == InstallMethod.DOWNLOAD) {
+                            openDownloadDialog()
                         }
                     },
                     onInstallClick = {
@@ -414,7 +452,8 @@ private fun MethodCard(
     noSecondSlot: Boolean,
     dataUri: Uri?,
     downloadUrl: String,
-    onDownloadUrlChange: (String) -> Unit,
+    isDownloadUrlValid: Boolean,
+    onRequestDownloadUrl: () -> Unit,
     onMethodChange: (InstallMethod?) -> Unit,
     onInstallClick: () -> Unit
 ) {
@@ -423,7 +462,7 @@ private fun MethodCard(
     val isMethodPatch = selectedMethod == InstallMethod.PATCH
     val isMethodDownload = selectedMethod == InstallMethod.DOWNLOAD
     val isMethodSelected = if (isMethodPatch) dataUri != null
-                           else if (isMethodDownload) downloadUrl.startsWith("https://")
+                           else if (isMethodDownload) isDownloadUrlValid
                            else selectedMethod != null
     val startContentColor = if (isMethodSelected) {
         MiuixTheme.colorScheme.onPrimary
@@ -527,19 +566,33 @@ private fun MethodCard(
                     }
 
                     AnimatedVisibility(
-                        visible = isMethodDownload,
+                        visible = isMethodDownload && downloadUrl.isNotBlank(),
                         enter = fadeIn() + expandVertically(),
                         exit = fadeOut() + shrinkVertically()
                     ) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        TextField(
-                            value = downloadUrl,
-                            onValueChange = onDownloadUrlChange,
-                            modifier = Modifier.fillMaxWidth(),
-                            label = context.getString(CoreR.string.download_dialog_msg),
-                            useLabelAsPlaceholder = true,
-                            singleLine = true
-                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = onRequestDownloadUrl
+                                )
+                                .padding(start = 36.dp, top = 4.dp, bottom = 4.dp)
+                        ) {
+                            Text(
+                                text = downloadUrl,
+                                style = MiuixTheme.textStyles.body2,
+                                color = MiuixTheme.colorScheme.onSurface
+                            )
+                            if (!isDownloadUrlValid) {
+                                Text(
+                                    text = stringResource(CoreR.string.module_repo_source_invalid),
+                                    style = MiuixTheme.textStyles.body2,
+                                    color = MiuixTheme.colorScheme.error
+                                )
+                            }
+                        }
                     }
 
                     if (isRooted) {
@@ -607,4 +660,12 @@ private fun NotesCard(notes: String) {
             modifier = Modifier.padding(16.dp)
         )
     }
+}
+
+private fun isValidDownloadUrl(url: String): Boolean {
+    if (url.isBlank()) return false
+    val uri = url.trim().toUri()
+    return uri.scheme.equals("https", ignoreCase = true) &&
+        !uri.host.isNullOrEmpty() &&
+        !uri.path.isNullOrEmpty()
 }
