@@ -1,9 +1,9 @@
 package io.github.seyud.weave.ui
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
@@ -49,6 +49,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -336,7 +337,7 @@ fun MainScreen(
                         entry<Route.Flash> { key ->
                             val uriArgs = key.uriStrings
                                 .filter { it.isNotEmpty() }
-                                .map(Uri::parse)
+                                .map { it.toUri() }
 
                             DisposableEffect(key.action) {
                                 onDispose {
@@ -389,7 +390,7 @@ fun MainScreen(
                                 onNavigateBack = { navigator.pop() },
                                 onLinkPressed = { link ->
                                     context.startActivity(
-                                        Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                                        Intent(Intent.ACTION_VIEW, link.toUri())
                                     )
                                 }
                             )
@@ -437,7 +438,7 @@ private fun FlashIntentHandler(
 private fun ShortcutIntentHandler(
     intentVersion: Int,
 ) {
-    val activity = LocalContext.current as? Activity ?: return
+    val activity = LocalActivity.current ?: return
     val navigator = LocalNavigator.current
 
     LaunchedEffect(intentVersion) {

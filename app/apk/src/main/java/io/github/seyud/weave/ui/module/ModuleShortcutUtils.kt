@@ -10,6 +10,7 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.scale
+import androidx.core.net.toUri
 import io.github.seyud.weave.core.integration.AppIconManager
 import io.github.seyud.weave.core.ktx.toast
 import io.github.seyud.weave.core.utils.RootUtils
@@ -158,7 +159,7 @@ fun loadShortcutBitmap(
     }
 
     return runCatching {
-        val uri = Uri.parse(iconUri)
+        val uri = iconUri.toUri()
         val rawBitmap = when {
             uri.scheme.equals(ROOT_ICON_SCHEME, ignoreCase = true) -> {
                 val path = uri.path.orEmpty()

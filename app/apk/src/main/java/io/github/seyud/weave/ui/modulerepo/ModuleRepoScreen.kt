@@ -58,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import io.github.seyud.weave.core.Config
 import io.github.seyud.weave.core.download.DownloadEngine
@@ -708,7 +709,7 @@ private fun startRepoAssetTransfer(context: Context, activity: MainActivity?, mo
 }
 
 private fun openExternalLink(context: Context, url: String) {
-    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
     try {
         context.startActivity(intent)
     } catch (_: ActivityNotFoundException) {

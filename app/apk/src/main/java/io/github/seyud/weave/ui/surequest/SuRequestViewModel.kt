@@ -11,6 +11,7 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeProvider
 import android.widget.Toast
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -260,7 +261,7 @@ class SuRequestViewModel(
         cancelTimer()
 
         val pos = _dialogState.value.selectedTimeoutIndex
-        timeoutPrefs.edit().putInt(packageName, pos).apply()
+        timeoutPrefs.edit { putInt(packageName, pos) }
 
         viewModelScope.launch {
             handler.respond(action, Config.Value.TIMEOUT_LIST[pos])

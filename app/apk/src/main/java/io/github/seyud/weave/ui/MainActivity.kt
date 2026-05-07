@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -738,9 +739,9 @@ class MainActivity : AppCompatActivity(), IActivityExtension, ViewModelHolder, W
         val currentIntent = intent ?: return null
         val action = currentIntent.getStringExtra(EXTRA_FLASH_ACTION) ?: return null
         val uris = currentIntent.getStringArrayListExtra(EXTRA_FLASH_URIS)
-            ?.map(Uri::parse)
+            ?.map { it.toUri() }
             ?.takeIf { it.isNotEmpty() }
-            ?: currentIntent.getStringExtra(EXTRA_FLASH_URI)?.let { listOf(Uri.parse(it)) }
+            ?: currentIntent.getStringExtra(EXTRA_FLASH_URI)?.let { listOf(it.toUri()) }
             ?: emptyList()
         val startMainTab = currentIntent.getIntExtra(EXTRA_START_MAIN_TAB, -1)
             .takeIf { it >= 0 }
