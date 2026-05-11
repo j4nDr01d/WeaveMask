@@ -18,3 +18,8 @@ ramdisk.img
 app/core/src/debug
 app/core/src/release
 app/gradle/gradle-daemon-jvm.properties
+
+
+website/node_modules
+website/docs/.vitepress/cache
+website/docs/.vitepress/dist
