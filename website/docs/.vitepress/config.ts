@@ -103,6 +103,7 @@ export default defineConfig({
     }
   },
   head: [
+    ['link', { rel: 'icon', type: 'image/png', href: '/WeaveMask/logo.png' }],
     [
       'script',
       {},
