@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("plugin.parcelize")
-    kotlin("plugin.serialization") version "2.3.20"
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -37,7 +37,7 @@ dependencies {
     implementation(libs.material)
 
     // Compose BOM
-    implementation(platform("androidx.compose:compose-bom:2026.03.01"))
+    implementation(platform(libs.compose.bom))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -60,10 +60,6 @@ dependencies {
     implementation(libs.miuix.preference)
     implementation(libs.miuix.icons)
     implementation(libs.miuix.blur)
-    implementation(libs.miuix.shapes)
-
-    // Backdrop (Liquid Glass)
-    implementation(libs.backdrop)
 
     // WebKit (WebViewAssetLoader)
     implementation("androidx.webkit:webkit:1.13.0")

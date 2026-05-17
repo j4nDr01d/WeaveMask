@@ -6,7 +6,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.LocalDensity
 import top.yukonga.miuix.kmp.blur.BlendColorEntry
 import top.yukonga.miuix.kmp.blur.BlurColors
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
@@ -45,7 +44,7 @@ fun Modifier.defaultBarBlur(
         Modifier.textureBlur(
             backdrop = backdrop,
             shape = shape,
-            blurRadius = DefaultBarBlurRadius * LocalDensity.current.density,
+            blurRadius = DefaultBarBlurRadius,
             colors = BlurColors(
                 blendColors = listOf(
                     BlendColorEntry(surfaceColor.copy(alpha = DefaultBarBlurTintAlpha)),

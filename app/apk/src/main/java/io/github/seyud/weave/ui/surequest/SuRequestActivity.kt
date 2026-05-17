@@ -90,7 +90,6 @@ class SuRequestActivity : ComponentActivity(), UntrackedActivity, IActivityExten
             WeaveMagiskTheme(
                 colorMode = colorMode,
                 keyColor = keyColor,
-                enableSmoothCorner = Config.enableSmoothCorner,
             ) {
                 val dialogState by viewModel.dialogState.collectAsStateWithLifecycle()
 

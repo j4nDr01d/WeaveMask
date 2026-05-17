@@ -54,7 +54,6 @@ class WebUIActivity : ComponentActivity() {
             WeaveMagiskTheme(
                 colorMode = colorMode,
                 keyColor = keyColor,
-                enableSmoothCorner = Config.enableSmoothCorner,
             ) {
                 MonetColorsProvider.UpdateCss()
                 MainContent(activity = this, onFinish = { finish() })

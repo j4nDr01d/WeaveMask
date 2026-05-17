@@ -26,7 +26,6 @@ import androidx.compose.material.icons.rounded.Colorize
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Palette
-import androidx.compose.material.icons.rounded.RoundedCorner
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.ui.unit.dp
 import io.github.seyud.weave.core.App as CoreApp
@@ -60,7 +59,6 @@ internal fun CustomizationSettingsSection(
     var enableBlur by rememberSaveable { mutableStateOf(Config.enableBlur) }
     var enableFloatingBottomBar by rememberSaveable { mutableStateOf(Config.enableFloatingBottomBar) }
     var enableFloatingBottomBarBlur by rememberSaveable { mutableStateOf(Config.enableFloatingBottomBarBlur) }
-    var enableSmoothCorner by rememberSaveable { mutableStateOf(Config.enableSmoothCorner) }
     var homeLayoutMode by rememberSaveable { mutableIntStateOf(Config.homeLayoutMode) }
     var themeMode by rememberSaveable { mutableIntStateOf(Config.colorMode) }
     var sliderValue by rememberSaveable { mutableStateOf(Config.pageScale) }
@@ -313,24 +311,6 @@ internal fun CustomizationSettingsSection(
                 },
             )
         }
-
-        SwitchPreference(
-            title = stringResource(CoreR.string.settings_smooth_corner),
-            summary = stringResource(CoreR.string.settings_smooth_corner_summary),
-            startAction = {
-                Icon(
-                    Icons.Rounded.RoundedCorner,
-                    modifier = Modifier.padding(end = 6.dp),
-                    contentDescription = stringResource(CoreR.string.settings_smooth_corner),
-                    tint = colorScheme.onBackground,
-                )
-            },
-            checked = enableSmoothCorner,
-            onCheckedChange = {
-                Config.enableSmoothCorner = it
-                enableSmoothCorner = it
-            },
-        )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             var enablePredictiveBack by rememberSaveable { mutableStateOf(Config.enablePredictiveBack) }

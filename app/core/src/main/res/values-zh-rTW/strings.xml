@@ -187,8 +187,6 @@
     <string name="settings_su_tapjack_title">啟用點選攔截保護</string>
     <string name="settings_su_tapjack_summary">發現有其他應用程式重疊在超級使用者視窗上面時，不回應允許操作</string>
     <string name="settings_customization">客製化</string>
-    <string name="settings_smooth_corner">平滑圓角</string>
-    <string name="settings_smooth_corner_summary">啟用全域平滑圓角效果</string>
     <string name="setting_add_shortcut_summary">在主螢幕中新增一個精緻的捷徑。防止隱藏 Magisk 以後，其名稱與圖示將難以辨識</string>
     <string name="settings_doh_title">安全化的網域解析(DoH)</string>
     <string name="settings_doh_description">解決某些地區的 DNS 中毒問題</string>

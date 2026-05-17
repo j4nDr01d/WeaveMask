@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -113,7 +114,6 @@ import top.yukonga.miuix.kmp.icon.extended.Link
 import top.yukonga.miuix.kmp.icon.extended.MoreCircle
 import top.yukonga.miuix.kmp.overlay.OverlayListPopup
 import top.yukonga.miuix.kmp.theme.MiuixTheme
-import top.yukonga.miuix.kmp.theme.miuixShape
 import top.yukonga.miuix.kmp.utils.overScrollVertical
 import top.yukonga.miuix.kmp.utils.scrollEndHaptic
 import io.github.seyud.weave.core.R as CoreR
@@ -253,7 +253,7 @@ private fun RepoModuleSummaryCard(module: RepoModuleSummary, onClick: () -> Unit
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = module.displayName, fontSize = 17.sp, fontWeight = FontWeight(550), modifier = Modifier.weight(1f))
                 if (module.metamodule) {
-                    Text(text = "META", fontSize = 12.sp, color = metaTint, modifier = Modifier.padding(start = 6.dp).clip(miuixShape(6.dp)).background(metaBg).padding(horizontal = 6.dp, vertical = 2.dp), fontWeight = FontWeight(750), maxLines = 1)
+                    Text(text = "META", fontSize = 12.sp, color = metaTint, modifier = Modifier.padding(start = 6.dp).clip(RoundedCornerShape(6.dp)).background(metaBg).padding(horizontal = 6.dp, vertical = 2.dp), fontWeight = FontWeight(750), maxLines = 1)
                 }
                 if (module.stargazerCount > 0) {
                     Row(verticalAlignment = Alignment.CenterVertically) {

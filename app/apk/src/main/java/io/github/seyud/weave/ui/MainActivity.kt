@@ -218,7 +218,6 @@ class MainActivity : AppCompatActivity(), IActivityExtension, ViewModelHolder, W
             var enableBlur by remember { mutableStateOf(Config.enableBlur) }
             var enableFloatingBottomBar by remember { mutableStateOf(Config.enableFloatingBottomBar) }
             var enableFloatingBottomBarBlur by remember { mutableStateOf(Config.enableFloatingBottomBarBlur) }
-            var enableSmoothCorner by remember { mutableStateOf(Config.enableSmoothCorner) }
             var pageScale by remember { mutableFloatStateOf(Config.pageScale) }
             var homeLayoutMode by remember { mutableIntStateOf(Config.homeLayoutMode) }
 
@@ -247,7 +246,6 @@ class MainActivity : AppCompatActivity(), IActivityExtension, ViewModelHolder, W
                         Config.Key.ENABLE_BLUR -> enableBlur = Config.enableBlur
                         Config.Key.ENABLE_FLOATING_BOTTOM_BAR -> enableFloatingBottomBar = Config.enableFloatingBottomBar
                         Config.Key.ENABLE_FLOATING_BOTTOM_BAR_BLUR -> enableFloatingBottomBarBlur = Config.enableFloatingBottomBarBlur
-                        Config.Key.ENABLE_SMOOTH_CORNER -> enableSmoothCorner = Config.enableSmoothCorner
                         Config.Key.PAGE_SCALE -> pageScale = Config.pageScale
                         Config.Key.HOME_LAYOUT_MODE -> homeLayoutMode = Config.homeLayoutMode
                     }
@@ -283,7 +281,6 @@ class MainActivity : AppCompatActivity(), IActivityExtension, ViewModelHolder, W
                 WeaveMagiskTheme(
                     colorMode = colorMode,
                     keyColor = keyColor,
-                    enableSmoothCorner = enableSmoothCorner,
                 ) {
                     Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
                         MainScreen(

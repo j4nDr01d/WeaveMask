@@ -355,8 +355,6 @@
     <string name="settings_floating_bottom_bar_summary">استخدام شريط سفلي عائم على طراز Apple</string>
     <string name="settings_enable_glass">تأثير الزجاج السائل</string>
     <string name="settings_enable_glass_summary">تفعيل تأثير الزجاج السائل للشريط السفلي العائم</string>
-    <string name="settings_smooth_corner">زوايا ناعمة</string>
-    <string name="settings_smooth_corner_summary">تفعيل الزوايا المدوّرة الناعمة على مستوى التطبيق</string>
     <string name="settings_enable_predictive_back">إيماءة الرجوع التنبؤية</string>
     <string name="settings_enable_predictive_back_summary">تفعيل دعم إيماءة الرجوع التنبؤية</string>
     <string name="settings_page_scale">مقياس الصفحة</string>

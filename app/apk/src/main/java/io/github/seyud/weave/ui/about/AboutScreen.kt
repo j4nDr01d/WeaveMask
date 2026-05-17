@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -94,7 +95,6 @@ import top.yukonga.miuix.kmp.blur.textureBlur
 import top.yukonga.miuix.kmp.icon.MiuixIcons
 import top.yukonga.miuix.kmp.icon.extended.ChevronForward
 import top.yukonga.miuix.kmp.overlay.OverlayBottomSheet
-import top.yukonga.miuix.kmp.shapes.SmoothRoundedCornerShape
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.utils.PressFeedbackType
 import top.yukonga.miuix.kmp.utils.overScrollVertical
@@ -425,7 +425,7 @@ private fun AboutContentBody(
                         .requiredSize(160.dp)
                         .textureBlur(
                             backdrop = backdrop,
-                            shape = SmoothRoundedCornerShape(16.dp),
+                            shape = RoundedCornerShape(16.dp),
                             blurRadius = 200f,
                             noiseCoefficient = BlurDefaults.NoiseCoefficient,
                             colors = BlurColors(blendColors = logoBlend),
@@ -452,7 +452,7 @@ private fun AboutContentBody(
                     }
                     .textureBlur(
                         backdrop = backdrop,
-                        shape = SmoothRoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(16.dp),
                         blurRadius = 150f,
                         noiseCoefficient = BlurDefaults.NoiseCoefficient,
                         colors = BlurColors(blendColors = logoBlend),
@@ -537,7 +537,7 @@ private fun AboutContentBody(
                             .padding(bottom = 12.dp)
                             .textureBlur(
                                 backdrop = backdrop,
-                                shape = SmoothRoundedCornerShape(16.dp),
+                                shape = RoundedCornerShape(16.dp),
                                 blurRadius = 60f,
                                 noiseCoefficient = BlurDefaults.NoiseCoefficient,
                                 colors = BlurColors(
@@ -570,7 +570,7 @@ private fun AboutContentBody(
                             .padding(bottom = 12.dp)
                             .textureBlur(
                                 backdrop = backdrop,
-                                shape = SmoothRoundedCornerShape(16.dp),
+                                shape = RoundedCornerShape(16.dp),
                                 blurRadius = 60f,
                                 noiseCoefficient = BlurDefaults.NoiseCoefficient,
                                 colors = BlurColors(
@@ -605,7 +605,7 @@ private fun AboutContentBody(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 8.dp),
-                    shape = SmoothRoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = MiuixTheme.colorScheme.surfaceContainer,
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -644,7 +644,7 @@ private fun AboutContentBody(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 8.dp),
-                    shape = SmoothRoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(12.dp),
                     color = MiuixTheme.colorScheme.surfaceContainer,
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {

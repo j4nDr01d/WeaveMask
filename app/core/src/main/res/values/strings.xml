@@ -366,8 +366,6 @@
     <string name="settings_floating_bottom_bar_summary">Use Apple style floating bottom bar</string>
     <string name="settings_enable_glass">Liquid glass</string>
     <string name="settings_enable_glass_summary">Enable liquid glass effect for floating bottom bar</string>
-    <string name="settings_smooth_corner">Smooth corner</string>
-    <string name="settings_smooth_corner_summary">Enable global smooth rounded corners</string>
     <string name="settings_enable_predictive_back">Predictive back gesture</string>
     <string name="settings_enable_predictive_back_summary">Enable predictive back gesture support</string>
     <string name="settings_page_scale">Page scale</string>

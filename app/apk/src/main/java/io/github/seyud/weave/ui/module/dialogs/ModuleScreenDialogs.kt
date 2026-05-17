@@ -187,7 +187,7 @@ private fun ModuleShortcutDialog(
                     Image(
                         bitmap = preview,
                         contentDescription = null,
-                        modifier = Modifier.size(72.dp).clip(top.yukonga.miuix.kmp.theme.miuixShape(24.dp)),
+                        modifier = Modifier.size(72.dp).clip(RoundedCornerShape(24.dp)),
                         contentScale = ContentScale.Fit,
                     )
                 } else {
@@ -195,7 +195,7 @@ private fun ModuleShortcutDialog(
                         Image(
                             bitmap = icon,
                             contentDescription = null,
-                            modifier = Modifier.size(72.dp).clip(top.yukonga.miuix.kmp.theme.miuixShape(24.dp)),
+                            modifier = Modifier.size(72.dp).clip(RoundedCornerShape(24.dp)),
                             contentScale = ContentScale.Fit,
                         )
                     }
