@@ -1,5 +1,6 @@
 package io.github.seyud.weave.ui.settings
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AppBlocking
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.LockReset
 import androidx.compose.material.icons.rounded.Security
@@ -41,12 +43,33 @@ internal fun SuperuserSettingsSection(
 
     SmallTitle(text = stringResource(CoreR.string.superuser))
     Card(modifier = Modifier.fillMaxWidth()) {
-        SuperuserModeSelectorItem(
-            res = res,
-            viewModel = viewModel,
-            currentMode = currentSuperuserListMode,
-            isActive = isActive,
+        var smartModeEnabled by rememberSaveable { mutableStateOf(Config.suSmartMode) }
+        SwitchPreference(
+            title = stringResource(CoreR.string.settings_su_smart_mode_title),
+            summary = stringResource(CoreR.string.settings_su_smart_mode_summary),
+            checked = smartModeEnabled,
+            onCheckedChange = {
+                Config.suSmartMode = it
+                smartModeEnabled = it
+            },
+            startAction = {
+                Icon(
+                    Icons.Rounded.AutoAwesome,
+                    modifier = Modifier.padding(end = 6.dp),
+                    contentDescription = null,
+                    tint = colorScheme.onBackground,
+                )
+            },
         )
+
+        AnimatedVisibility(visible = smartModeEnabled) {
+            SuperuserModeSelectorItem(
+                res = res,
+                viewModel = viewModel,
+                currentMode = currentSuperuserListMode,
+                isActive = isActive,
+            )
+        }
 
         if (visibility.showTapjack) {
             var tapjackEnabled by rememberSaveable { mutableStateOf(Config.suTapjack) }
