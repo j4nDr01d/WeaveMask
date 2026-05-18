@@ -95,6 +95,9 @@
     <string name="none">无</string>
     <string name="superuser_toggle_notification">通知</string>
     <string name="superuser_toggle_revoke">撤销</string>
+    <string name="su_action_launch">启动</string>
+    <string name="su_action_force_stop">强制停止</string>
+    <string name="su_action_restart">重新启动</string>
     <string name="superuser_policy_none">尚无应用请求超级用户权限</string>
 
     <!--Logs-->

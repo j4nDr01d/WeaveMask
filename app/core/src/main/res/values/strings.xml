@@ -97,6 +97,9 @@
     <string name="none">None</string>
     <string name="superuser_toggle_notification">Notifications</string>
     <string name="superuser_toggle_revoke">Revoke</string>
+    <string name="su_action_launch">Launch</string>
+    <string name="su_action_force_stop">Force Stop</string>
+    <string name="su_action_restart">Restart</string>
     <string name="superuser_policy_none">No apps have asked for Superuser permission yet.</string>
 
     <!--Logs-->
