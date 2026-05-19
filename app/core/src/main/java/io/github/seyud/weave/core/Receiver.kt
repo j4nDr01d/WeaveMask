@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.IntentCompat
 import io.github.seyud.weave.core.base.BaseReceiver
+import io.github.seyud.weave.core.data.magiskdb.PolicyBackupStore
 import io.github.seyud.weave.core.di.ServiceLocator
 import io.github.seyud.weave.core.download.DownloadEngine
 import io.github.seyud.weave.core.download.Subject
@@ -40,6 +41,13 @@ open class Receiver : BaseReceiver() {
         }
 
         when (intent.action ?: return) {
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_LOCKED_BOOT_COMPLETED -> {
+                @OptIn(DelicateCoroutinesApi::class)
+                GlobalScope.launch {
+                    PolicyBackupStore.restoreIfNeeded(policyDB)
+                }
+            }
             DownloadEngine.ACTION -> {
                 IntentCompat.getParcelableExtra(
                     intent, DownloadEngine.SUBJECT_KEY, Subject::class.java)?.let {

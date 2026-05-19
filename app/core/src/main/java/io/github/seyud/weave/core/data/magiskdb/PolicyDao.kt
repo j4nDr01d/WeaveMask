@@ -8,6 +8,8 @@ private const val SELECT_QUERY = "SELECT (until - strftime(\"%s\", \"now\")) AS 
 
 class PolicyDao : MagiskDB() {
 
+    private var backupRestored = false
+
     suspend fun deleteOutdated() {
         val query = "DELETE FROM ${Table.POLICY} WHERE " +
             "(until > 0 AND until < strftime(\"%s\", \"now\")) OR until < 0"
@@ -17,9 +19,11 @@ class PolicyDao : MagiskDB() {
     suspend fun delete(uid: Int) {
         val query = "DELETE FROM ${Table.POLICY} WHERE uid=$uid"
         exec(query)
+        PolicyBackupStore.remove(uid)
     }
 
     suspend fun fetch(uid: Int): SuPolicy? {
+        ensureBackupRestored()
         val query = "$SELECT_QUERY FROM ${Table.POLICY} WHERE uid=$uid LIMIT 1"
         return exec(query, ::toPolicy).firstOrNull()
     }
@@ -32,11 +36,19 @@ class PolicyDao : MagiskDB() {
         }
         val query = "REPLACE INTO ${Table.POLICY} ${map.toQuery()}"
         exec(query)
+        PolicyBackupStore.backupSingle(policy)
     }
 
     suspend fun fetchAll(): List<SuPolicy> {
+        ensureBackupRestored()
         val query = "$SELECT_QUERY FROM ${Table.POLICY} WHERE uid/100000=${Const.USER_ID}"
         return exec(query, ::toPolicy).filterNotNull()
+    }
+
+    private suspend fun ensureBackupRestored() {
+        if (backupRestored) return
+        backupRestored = true
+        PolicyBackupStore.restoreIfNeeded(this)
     }
 
     private fun toPolicy(map: Map<String, String>): SuPolicy? {

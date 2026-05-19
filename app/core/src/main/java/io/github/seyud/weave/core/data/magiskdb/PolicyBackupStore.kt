@@ -1,0 +1,64 @@
+package io.github.seyud.weave.core.data.magiskdb
+
+import android.content.Context
+import io.github.seyud.weave.core.AppContext
+import io.github.seyud.weave.core.model.su.SuPolicy
+
+/**
+ * Backs up su policies to SharedPreferences so they survive the native daemon's
+ * prune_su_access() which may delete all policies from the database during early
+ * boot when /data/user_de is not yet accessible.
+ */
+object PolicyBackupStore {
+
+    private const val PREFS_NAME = "su_policy_backup"
+    private const val KEY_POLICIES = "policies"
+
+    private fun prefs() = AppContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    fun backup(policies: List<SuPolicy>) {
+        val entries = policies.joinToString(";") { p ->
+            "${p.uid}:${p.policy}:${p.remain}:${if (p.logging) 1 else 0}:${if (p.notification) 1 else 0}"
+        }
+        prefs().edit().putString(KEY_POLICIES, entries).commit()
+    }
+
+    fun backupSingle(policy: SuPolicy) {
+        val current = load()
+        val updated = current.filter { it.uid != policy.uid } + policy
+        backup(updated)
+    }
+
+    fun remove(uid: Int) {
+        val current = load().filter { it.uid != uid }
+        backup(current)
+    }
+
+    fun load(): List<SuPolicy> {
+        val raw = prefs().getString(KEY_POLICIES, "") ?: ""
+        if (raw.isEmpty()) return emptyList()
+        return raw.split(";").mapNotNull { entry ->
+            val parts = entry.split(":")
+            if (parts.size >= 5) {
+                SuPolicy(
+                    uid = parts[0].toIntOrNull() ?: return@mapNotNull null,
+                    policy = parts[1].toIntOrNull() ?: SuPolicy.QUERY,
+                    remain = parts[2].toLongOrNull() ?: 0L,
+                ).apply {
+                    logging = parts[3] == "1"
+                    notification = parts[4] == "1"
+                }
+            } else null
+        }
+    }
+
+    suspend fun restoreIfNeeded(dao: PolicyDao) {
+        val backed = load()
+        if (backed.isEmpty()) return
+        for (policy in backed) {
+            if (dao.fetch(policy.uid) == null) {
+                dao.update(policy)
+            }
+        }
+    }
+}

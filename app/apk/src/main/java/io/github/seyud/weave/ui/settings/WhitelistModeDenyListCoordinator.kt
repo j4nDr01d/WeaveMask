@@ -234,16 +234,27 @@ internal class WhitelistModeDenyListCoordinator(
 
     suspend fun restoreBlacklistMode(): WhitelistModeDenyListResult = withContext(Dispatchers.IO) {
         val snapshot = snapshotStore.get()
-            ?: return@withContext WhitelistModeDenyListResult(
-                success = true,
-                denyListEnabled = isDenyListEnabled(),
-            )
-
-        val result = restoreSnapshot(snapshot)
-        if (result.success) {
-            snapshotStore.set(null)
+        if (snapshot != null) {
+            val result = restoreSnapshot(snapshot)
+            if (result.success) {
+                snapshotStore.set(null)
+            }
+            return@withContext result
         }
-        result
+
+        // Snapshot lost (e.g. app update/data migration cleared NO_MIGRATION keys).
+        // Fallback: clear all DenyList entries that were added during whitelist mode.
+        val currentEntries = listEntries()
+        if (currentEntries.isNotEmpty()) {
+            clearEntries(currentEntries)
+        }
+        if (!setDenyListEnabled(false)) {
+            return@withContext failureResult(isDenyListEnabled())
+        }
+        WhitelistModeDenyListResult(
+            success = true,
+            denyListEnabled = false,
+        )
     }
 
     suspend fun ensurePackageSynced(packageName: String): WhitelistModeDenyListResult = withContext(Dispatchers.IO) {

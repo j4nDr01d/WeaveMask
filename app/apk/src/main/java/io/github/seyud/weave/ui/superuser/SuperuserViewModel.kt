@@ -511,7 +511,7 @@ class SuperuserViewModel internal constructor(
         db.delete(entry.item.uid)
         if (isWhitelistMode(loadedListMode)) {
             entry.item.policy = SuPolicy.QUERY
-            entry.item.remain = -1
+            entry.item.remain = 0
             entry.item.notification = true
             entry.item.logging = true
         } else {
