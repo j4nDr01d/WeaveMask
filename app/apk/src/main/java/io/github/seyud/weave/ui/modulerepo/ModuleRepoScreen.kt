@@ -7,6 +7,9 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Star
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
@@ -408,7 +411,6 @@ private fun RepoReadmePage(
     scrollBehavior: ScrollBehavior,
 ) {
     val layoutDirection = LocalLayoutDirection.current
-    var htmlLoading by remember(detail.moduleId, detail.readmeHtml) { mutableStateOf(detail.readmeHtml.isNotBlank()) }
     LazyColumn(
         modifier = Modifier
             .fillMaxHeight()
@@ -428,15 +430,36 @@ private fun RepoReadmePage(
                 Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp)) {
                     when {
                         detail.readmeHtml.isNotBlank() -> {
-                            HtmlText(
-                                content = detail.readmeHtml,
-                                baseUrl = detail.sourceUrl.ifBlank { buildRepoModulePageUrl(Config.moduleRepoBaseUrl, detail.moduleId) },
-                                modifier = Modifier.fillMaxWidth(),
-                                onLoadingChange = { htmlLoading = it },
+                            var loaded by remember(detail.readmeHtml) { mutableStateOf(false) }
+                            val alpha by animateFloatAsState(
+                                targetValue = if (loaded) 1f else 0f,
+                                animationSpec = tween(durationMillis = 300),
+                                label = "ReadmeAlpha",
                             )
-                            if (htmlLoading) {
-                                Box(modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp), contentAlignment = Alignment.Center) {
-                                    InfiniteProgressIndicator()
+                            val placeholderAlpha by animateFloatAsState(
+                                targetValue = if (loaded) 0f else 1f,
+                                animationSpec = tween(durationMillis = 150),
+                                label = "ReadmePlaceholderAlpha",
+                            )
+                            Box(modifier = Modifier.fillMaxWidth()) {
+                                Box(modifier = Modifier.graphicsLayer { this.alpha = alpha }) {
+                                    HtmlText(
+                                        content = detail.readmeHtml,
+                                        baseUrl = detail.sourceUrl.ifBlank { buildRepoModulePageUrl(Config.moduleRepoBaseUrl, detail.moduleId) },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        onLoadingChange = { loaded = !it },
+                                    )
+                                }
+                                if (placeholderAlpha > 0f) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 32.dp)
+                                            .graphicsLayer { this.alpha = placeholderAlpha },
+                                        contentAlignment = Alignment.Center,
+                                    ) {
+                                        InfiniteProgressIndicator()
+                                    }
                                 }
                             }
                         }
@@ -485,7 +508,42 @@ private fun RepoReleasesPage(
                     }
                     if (release.descriptionHtml.isNotBlank()) {
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp, color = MiuixTheme.colorScheme.outline.copy(alpha = 0.5f))
-                        HtmlText(content = release.descriptionHtml, baseUrl = detail.sourceUrl.ifBlank { detail.url }, modifier = Modifier.fillMaxWidth())
+                        var descLoaded by remember(release.descriptionHtml) { mutableStateOf(false) }
+                        val descAlpha by animateFloatAsState(
+                            targetValue = if (descLoaded) 1f else 0f,
+                            animationSpec = tween(durationMillis = 300),
+                            label = "ReleaseDescAlpha",
+                        )
+                        val descPlaceholderAlpha by animateFloatAsState(
+                            targetValue = if (descLoaded) 0f else 1f,
+                            animationSpec = tween(durationMillis = 150),
+                            label = "ReleaseDescPlaceholderAlpha",
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateContentSize(animationSpec = tween(durationMillis = 300)),
+                        ) {
+                            Box(modifier = Modifier.graphicsLayer { this.alpha = descAlpha }) {
+                                HtmlText(
+                                    content = release.descriptionHtml,
+                                    baseUrl = detail.sourceUrl.ifBlank { detail.url },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onLoadingChange = { descLoaded = !it },
+                                )
+                            }
+                            if (descPlaceholderAlpha > 0f) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(72.dp)
+                                        .graphicsLayer { this.alpha = descPlaceholderAlpha },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    InfiniteProgressIndicator()
+                                }
+                            }
+                        }
                     }
                     if (release.releaseAssets.isNotEmpty()) HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), thickness = 0.5.dp, color = MiuixTheme.colorScheme.outline.copy(alpha = 0.5f))
                     release.releaseAssets.forEachIndexed { index, asset ->
