@@ -43,6 +43,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
@@ -548,7 +550,10 @@ private fun MainTabScreen(
 
     val destinations = BottomBarDestination.entries
     val isSuperuserEnabled = Info.showSuperUser
-    val isModuleEnabled = Info.env.isActive && LocalModule.loaded()
+    val isRootServiceConnected by Info.isRootServiceConnected.observeAsState(initial = false)
+    val isModuleEnabled = remember(isRootServiceConnected, Info.env.isActive) {
+        Info.env.isActive && LocalModule.loaded()
+    }
 
     // 使用 rememberContentReady 延迟加载 Pager 内容
     val contentReady = rememberContentReady()
@@ -586,16 +591,17 @@ private fun MainTabScreen(
                     isLiquidGlassEnabled = enableBlur && enableFloatingBottomBarBlur,
                 ) {
                     destinations.forEachIndexed { index, destination ->
+                        val itemEnabled = when (index) {
+                            1 -> isSuperuserEnabled
+                            2 -> isModuleEnabled
+                            else -> true
+                        }
                         FloatingBottomBarItem(
                             onClick = {
-                                val enabled = when (index) {
-                                    1 -> isSuperuserEnabled
-                                    2 -> isModuleEnabled
-                                    else -> true
-                                }
-                                if (enabled) mainPagerState.animateToPage(index)
+                                if (itemEnabled) mainPagerState.animateToPage(index)
                             },
                             modifier = Modifier.defaultMinSize(minWidth = 76.dp)
+                                .then(if (!itemEnabled) Modifier.alpha(0.38f) else Modifier)
                         ) {
                             Icon(
                                 imageVector = destination.icon,

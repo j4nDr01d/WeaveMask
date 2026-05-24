@@ -2,6 +2,7 @@ package io.github.seyud.weave.core.data.magiskdb
 
 import android.content.Context
 import io.github.seyud.weave.core.AppContext
+import io.github.seyud.weave.core.ktx.deviceProtectedContext
 import io.github.seyud.weave.core.model.su.SuPolicy
 
 /**
@@ -14,7 +15,7 @@ object PolicyBackupStore {
     private const val PREFS_NAME = "su_policy_backup"
     private const val KEY_POLICIES = "policies"
 
-    private fun prefs() = AppContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private fun prefs() = AppContext.deviceProtectedContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun backup(policies: List<SuPolicy>) {
         val entries = policies.joinToString(";") { p ->
@@ -56,6 +57,9 @@ object PolicyBackupStore {
         val backed = load()
         if (backed.isEmpty()) return
         for (policy in backed) {
+            if (policy.remain < 0) {
+                policy.remain = 0
+            }
             if (dao.fetch(policy.uid) == null) {
                 dao.update(policy)
             }

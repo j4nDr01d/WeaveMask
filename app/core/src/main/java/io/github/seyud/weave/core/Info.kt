@@ -68,6 +68,8 @@ object Info {
 
     val isConnected = MutableLiveData(false)
 
+    val isRootServiceConnected = MutableLiveData(false)
+
     val showSuperUser: Boolean get() {
         return env.isActive && (Const.USER_ID == 0
                 || Config.suMultiuserMode == Config.Value.MULTIUSER_MODE_USER)

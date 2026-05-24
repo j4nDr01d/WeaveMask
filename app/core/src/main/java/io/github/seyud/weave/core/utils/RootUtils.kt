@@ -199,11 +199,13 @@ class RootUtils(stub: Any?) : RootService() {
                 fs = FileSystemManager.getRemote(it.fileSystem)
             }
             releaseShared(1)
+            Info.isRootServiceConnected.value = true
         }
 
         override fun onServiceDisconnected(name: ComponentName) {
             state = 1
             remoteService = null
+            Info.isRootServiceConnected.value = false
             bind(Intent().setComponent(name), this)
         }
 

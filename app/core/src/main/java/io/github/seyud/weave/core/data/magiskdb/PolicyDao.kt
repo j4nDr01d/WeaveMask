@@ -42,7 +42,11 @@ class PolicyDao : MagiskDB() {
     suspend fun fetchAll(): List<SuPolicy> {
         ensureBackupRestored()
         val query = "$SELECT_QUERY FROM ${Table.POLICY} WHERE uid/100000=${Const.USER_ID}"
-        return exec(query, ::toPolicy).filterNotNull()
+        val policies = exec(query, ::toPolicy).filterNotNull()
+        if (PolicyBackupStore.load().isEmpty() && policies.isNotEmpty()) {
+            PolicyBackupStore.backup(policies)
+        }
+        return policies
     }
 
     private suspend fun ensureBackupRestored() {
